@@ -149,7 +149,9 @@ Y veremos que ahora el test pasa
 
 #### 1- Separación de componentes
 
-- Vamos a separar los tres componentes principales en archivos ![image](./doc/images/main-files.png).
+- Vamos a separar los tres componentes principales cada uno en su archivo
+
+![image](./doc/images/main-files.png).
 
 #### 2- Eliminamos la lógica asociada al estado por defecto
 
@@ -188,17 +190,19 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-}```
-#### 3- Creamos un view model
+}
+```
 
-Como paso siguiente vamos a eliminar el valor inicial 10 en nuestro HomeState. Para ello necesitaremos de un colaborador que nos indique cúal es el valor inicial del contador.
+#### 3- MVVM
 
-La comunicación entre vistas y modelo la vamos a efuctuar siguiendo el patrón MVVM por lo que vamos a crear un view model asociado.
+Como paso siguiente vamos a eliminar el código duro del valor inicial 10 en nuestro HomeState. Para ello necesitaremos de un colaborador que nos indique cúal es el valor inicial del contador.
 
-Para poder acceder a la instancia del view model vamos a utilizar el paquete provider
+La comunicación entre vistas y modelo la vamos a efectuar siguiendo el patrón MVVM, motivo por el que vamos a crear un view model asociado a la vista.
+
+Para poder acceder a la instancia del view model vamos a utilizar IoC (Inversión de control) mediante el paquete qinject
 
 ```bash
-flutter pub add provider
+flutter pub add qinject
 ```
 
 > lib/my_home_page.dart
@@ -264,18 +268,59 @@ class MyHomePageViewModel {
 }
 ```
 
--------------------------------------
+## Segundo escenario
+
+En BDD vamos identificando necesidades del usuario de la aplicación, automatizamos este escenario y luego construímos la lógica asociada utilizando TDD. Esto puede ser visto como dos ciclos de desarrollo bien definidos como se muestra en la siguiente imagen:
+
+![](https://huddle.eurostarsoftwaretesting.com/wp-content/uploads/2015/06/bdd-cycle-around-tdd-cycles.png)
+
+En nuestro ejemplo luego de haber implementado el primer escenario deberíamos continuar implementando el view model, servicios, repositorios, servidor, etc.
+
+Por simplicidad solo nos vamos a limitar a mostrar el ciclo de BDD y vamos a dejar de lado la implementación end to end (de extremo a extremo) de la aplicación.
+
+Incluso vale aclarar que en general la técnica BDD se utiliza con test de aceptación (pruebas sobre la aplicación real) y en nuestro caso lo hemos aplicado con test unitarios de widgets.
+
+Dicho lo anterior vamos a continuar con nuestro segundo escenario de uso lo cual nos permitirá seguir identificando necesidades de nuestra aplicación.
+
+> test/counter.feature
 
 ```gherkin
 Feature: Counter
     
-    Background:
-        Given the app is running
-    
-    Scenario: Initial counter value is 0        
-        Then I see {'0'} value
-    
+    Scenario: Show initial counter value
+        Given counter value is {10}
+        Given the app is running        
+        Then I see {10} value
+
     Scenario: Tap add button
+        Given counter value is {5}
         When tap add button
-        Then I see {'1'} value
+        Then I see {6} value
+```
+
+```bash
+flutter pub run build_runner build --delete-conflicting-outputs
+flutter test
+```
+
+> test/step/tap_add_button.dart
+
+En el paso "tap add button" debemos verificar que se informe al view model que se ha tapeado el botón de incremento y también debemos simular el valor de retorno del valor del contador (incrementado en 1).
+
+```dart
+import 'package:flutter_bdd/my_home_page_view_model.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
+import 'package:qinject/qinject.dart';
+
+import 'counter_value_is.mocks.dart';
+
+Future<void> tapAddButton(WidgetTester tester) async {
+  await tester.tap(find.byTooltip('Increment'));
+  
+  var mockViewModel =
+      Qinject.use<dynamic, MyHomePageViewModel>() as MockMyHomePageViewModel;  
+  verify(mockViewModel.onAddButtonTapped()).called(1);
+  when(mockViewModel.counterValue).thenReturn(mockViewModel.counterValue + 1);
+}
 ```

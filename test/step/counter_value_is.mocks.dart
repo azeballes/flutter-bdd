@@ -3,7 +3,8 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:flutter_bdd/my_home_page_view_model.dart' as _i2;
+import 'package:flutter/foundation.dart' as _i2;
+import 'package:flutter_bdd/my_home_page_view_model.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -17,15 +18,32 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
+class _FakeValueListenable_0<T> extends _i1.SmartFake
+    implements _i2.ValueListenable<T> {
+  _FakeValueListenable_0(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
 /// A class which mocks [MyHomePageViewModel].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockMyHomePageViewModel extends _i1.Mock
-    implements _i2.MyHomePageViewModel {
+    implements _i3.MyHomePageViewModel {
   @override
-  int get counterValue => (super.noSuchMethod(
+  _i2.ValueListenable<int> get counterValue => (super.noSuchMethod(
         Invocation.getter(#counterValue),
-        returnValue: 0,
-        returnValueForMissingStub: 0,
-      ) as int);
+        returnValue: _FakeValueListenable_0<int>(
+          this,
+          Invocation.getter(#counterValue),
+        ),
+        returnValueForMissingStub: _FakeValueListenable_0<int>(
+          this,
+          Invocation.getter(#counterValue),
+        ),
+      ) as _i2.ValueListenable<int>);
 }

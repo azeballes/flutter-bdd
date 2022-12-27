@@ -1,3 +1,7 @@
+import 'package:flutter/foundation.dart';
+
 class MyHomePageViewModel {
-  int get counterValue => 0;
+  ValueListenable<int> get counterValue => ValueNotifier(0);
+
+  onAddButtonTapped() {}
 }
