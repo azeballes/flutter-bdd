@@ -18,9 +18,9 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeValueListenable_0<T> extends _i1.SmartFake
-    implements _i2.ValueListenable<T> {
-  _FakeValueListenable_0(
+class _FakeValueNotifier_0<T> extends _i1.SmartFake
+    implements _i2.ValueNotifier<T> {
+  _FakeValueNotifier_0(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -35,15 +35,15 @@ class _FakeValueListenable_0<T> extends _i1.SmartFake
 class MockMyHomePageViewModel extends _i1.Mock
     implements _i3.MyHomePageViewModel {
   @override
-  _i2.ValueListenable<int> get counterValue => (super.noSuchMethod(
+  _i2.ValueNotifier<int> get counterValue => (super.noSuchMethod(
         Invocation.getter(#counterValue),
-        returnValue: _FakeValueListenable_0<int>(
+        returnValue: _FakeValueNotifier_0<int>(
           this,
           Invocation.getter(#counterValue),
         ),
-        returnValueForMissingStub: _FakeValueListenable_0<int>(
+        returnValueForMissingStub: _FakeValueNotifier_0<int>(
           this,
           Invocation.getter(#counterValue),
         ),
-      ) as _i2.ValueListenable<int>);
+      ) as _i2.ValueNotifier<int>);
 }

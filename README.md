@@ -305,7 +305,7 @@ flutter test
 
 > test/step/tap_add_button.dart
 
-En el paso "tap add button" debemos verificar que se informe al view model que se ha tapeado el botón de incremento y también debemos simular el valor de retorno del valor del contador (incrementado en 1).
+En el paso "tap add button" tendremos que verificar que se informe al view model que se ha tapeado el botón de incremento. Simular el valor de retorno del valor del contador (incrementado en 1). Por último la vista deberá ser informada de que el valor del contador ha cambiado para poder redibujarse.
 
 ```dart
 import 'package:flutter_bdd/my_home_page_view_model.dart';
@@ -313,14 +313,78 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:qinject/qinject.dart';
 
-import 'counter_value_is.mocks.dart';
-
 Future<void> tapAddButton(WidgetTester tester) async {
   await tester.tap(find.byTooltip('Increment'));
-  
-  var mockViewModel =
-      Qinject.use<dynamic, MyHomePageViewModel>() as MockMyHomePageViewModel;  
+
+  var mockViewModel = Qinject.use<dynamic, MyHomePageViewModel>();
   verify(mockViewModel.onAddButtonTapped()).called(1);
-  when(mockViewModel.counterValue).thenReturn(mockViewModel.counterValue + 1);
+
+  mockViewModel.counterValue.value = mockViewModel.counterValue.value + 1;
+  mockViewModel.counterValue.notifyListeners();
+
+  await tester.pumpAndSettle();
 }
 ```
+
+Para poder efectuar lo anterior tendremos que modificar "counterValue" en el view model para que pueda informar sus cambios de valores a la vista.
+
+```dart
+import 'package:flutter/foundation.dart';
+
+class MyHomePageViewModel {
+  ValueNotifier<int> get counterValue => ValueNotifier(0);
+
+  onAddButtonTapped() {}
+}
+```
+
+Finalmente modificamos la vista para poder responder a los cambios de valor en el contador e informar al view model cuando se presione el botón "Increment"
+
+```dart
+class _MyHomePageState extends State<MyHomePage> {
+  late MyHomePageViewModel _viewModel;
+
+  @override
+  void initState() {
+    _viewModel = qinjector.use();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'You have pushed the button this many times:',
+            ),
+            _counterValue(context),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _viewModel.onAddButtonTapped,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _counterValue(BuildContext context) {
+    return ValueListenableBuilder<int>(
+      valueListenable: _viewModel.counterValue,
+      builder: (context, value, _) => Text(
+        '$value',
+        style: Theme.of(context).textTheme.headline4,
+      ),
+    );
+  }
+}
+```
+
+## Comentarios finales

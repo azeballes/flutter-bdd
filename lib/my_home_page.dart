@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bdd/ioc_module.dart';
 import 'package:flutter_bdd/my_home_page_view_model.dart';
@@ -34,7 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
             const Text(
               'You have pushed the button this many times:',
             ),
-            _newMethod(context),
+            _counterValue(context),
           ],
         ),
       ),
@@ -46,10 +45,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _newMethod(BuildContext context) {
+  Widget _counterValue(BuildContext context) {
     return ValueListenableBuilder<int>(
       valueListenable: _viewModel.counterValue,
-      builder: (context, value, child) => Text(
+      builder: (context, value, _) => Text(
         '$value',
         style: Theme.of(context).textTheme.headline4,
       ),
